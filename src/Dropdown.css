@@ -1,0 +1,98 @@
+.dropdown-container {
+  position: relative;
+  width: 100%;
+  font-size: 1rem;
+}
+
+.dropdown-header {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none; /* Prevents text selection on click */
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.dropdown-header:hover {
+  border-color: #999;
+}
+
+.dropdown-container:focus-within .dropdown-header {
+  border-color: #0073B1;
+  box-shadow: 0 0 0 2px rgba(0, 115, 177, 0.2);
+}
+
+.dropdown-arrow {
+  transition: transform 0.3s ease;
+}
+
+.dropdown-arrow.open {
+  transform: rotate(180deg);
+}
+
+.dropdown-list-container {
+  position: absolute;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  z-index: 1000; /* Ensures it appears above other elements */
+  margin-top: 4px;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.dropdown-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dropdown-list-item {
+  padding: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.dropdown-list-item:hover {
+  background-color: #f0f8ff; /* A light blue hover effect */
+}
+
+.dropdown-header-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag-item {
+  background-color: #e0eaf1;
+  color: #003E51;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  font-size: 0.9em;
+}
+
+.tag-remove {
+  margin-left: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.1em;
+  line-height: 1;
+}
+
+.tag-remove:hover {
+  color: #d9534f; /* A reddish color for the remove icon */
+}
+
+/* Style for highlighting selected items in the list */
+.dropdown-list-item.selected {
+  background-color: #0073b1;
+  color: white;
+}
