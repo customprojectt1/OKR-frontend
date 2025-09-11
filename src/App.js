@@ -4,8 +4,25 @@ import React, { useState } from 'react';
 import './App.css';
 import SummaryBox from './SummaryBox';
 import Dropdown from './Dropdown';
-import { mltLeadOptions, objectiveOptions, countryOptions } from './Data/formOptions'; // Corrected path
-import axios from 'axios'; // <-- IMPORT AXIOS
+import axios from 'axios';
+
+// Import all our specific option lists from the data file
+import {
+  mltLeadOptions,
+  objectiveOptions,
+  brandFilters,
+  marketingOriginatedRevenueFilters,
+  propertyMarketingFilters,
+  globalOnlyFilters,
+  marketingInfluencedRevenueFilters,
+  businessInquiriesFilters,
+  budgetAccuracyFilters,
+  earnedMediaFilters,
+  campaignROIFilters,
+  eventSuccessFilters,
+  coeUsageFilters,
+  peopleSurveyFilters,
+} from './Data/formOptions'; // Corrected path
 
 const initialFormState = {
   yourName: '',
@@ -16,12 +33,37 @@ const initialFormState = {
   objectiveDetails: {}
 };
 
+// This "brain" maps a specific objective's 'value' to the correct filter array
+const filterOptionsMap = {
+  'brand_awareness': brandFilters,
+  'brand_familiarity': brandFilters,
+  'marketing_originated_revenue': marketingOriginatedRevenueFilters,
+  'property_marketing_revenue': propertyMarketingFilters,
+  'marketing_influenced_revenue': marketingInfluencedRevenueFilters,
+  'pipeline_contribution': marketingInfluencedRevenueFilters,
+  'digital_delivery': globalOnlyFilters,
+  'com_conversion_rate': globalOnlyFilters,
+  'business_inquiries': businessInquiriesFilters,
+  'organic_search': businessInquiriesFilters,
+  'earned_media_sov': earnedMediaFilters,
+  'newsletter_engagement': globalOnlyFilters,
+  'earned_media_quality': earnedMediaFilters,
+  'intranet_engagement': earnedMediaFilters,
+  'budget_accuracy': budgetAccuracyFilters,
+  'campaign_roi': campaignROIFilters,
+  'event_success': eventSuccessFilters,
+  'coe_usage': coeUsageFilters,
+  'people_survey_engagement': peopleSurveyFilters,
+  // 'development_plan' has no filter, so it's not needed here
+};
+
+
 function App() {
   const [formData, setFormData] = useState(initialFormState);
-  const [submissionStatus, setSubmissionStatus] = useState('idle'); // idle | submitting | success | error
+  const [submissionStatus, setSubmissionStatus] = useState('idle');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  // --- All your other functions remain exactly the same ---
+  // --- All handler functions remain the same ---
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -53,11 +95,14 @@ function App() {
     return sum + parseFloat(weight || '0');
   }, 0);
 
-  // --- UPDATED: handleSubmit function to use Axios and .env variable ---
+  // Helper function to get the correct filter options using the map
+  const getFilterOptionsForObjective = (objective) => {
+    return filterOptionsMap[objective.value] || []; // Return the mapped list or an empty list
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-    
-    // Your excellent validation logic remains unchanged
+    // Your validation logic is perfect and does not need to change
     const missingFields = [];
     if (!formData.yourName.trim()) missingFields.push("Your Name");
     if (!formData.yourEmail.trim()) missingFields.push("Your Email Address");
@@ -88,31 +133,19 @@ function App() {
     }
 
     setSubmissionStatus('submitting');
-    
-    // Use the .env variable and the correct endpoint from your server.js
     const apiUrl = `${process.env.REACT_APP_API_URL}/api/submit-form`;
-
     try {
-      // Use axios to send the data
       const response = await axios.post(apiUrl, formData);
-
-      // Check for a successful response from the server
       if (response.status === 200) {
         setSubmissionStatus('success');
-        setShowSuccessModal(true); // Show your success modal
-        setFormData(initialFormState); // Reset the form
-        
-        // Optional: Reset the status back to idle after a few seconds
+        setShowSuccessModal(true);
+        setFormData(initialFormState);
         setTimeout(() => setSubmissionStatus('idle'), 4000);
-      } else {
-        // Handle cases where the server responds with an error status code
-        throw new Error(`Server responded with status: ${response.status}`);
-      }
+      } else { throw new Error(`Server responded with status: ${response.status}`); }
     } catch (error) {
       setSubmissionStatus('error');
       console.error("SUBMISSION FAILED:", error.response ? error.response.data : error.message);
       alert("An error occurred while submitting the form. Please check the console for details.");
-      // Reset to idle so the user can try again
       setSubmissionStatus('idle');
     }
   };
@@ -121,10 +154,8 @@ function App() {
 
   return (
     <div>
-      {/* The rest of your JSX is exactly the same as before */}
-      <div className="logo-container">
-        <img src="/Logo/JLL logo negative - RGB.png" alt="Company Logo" />
-      </div>
+      {/* ... Your JSX for logo, layout, and form remains here ... */}
+      <div className="logo-container"> <img src="/Logo/JLL logo negative - RGB.png" alt="Company Logo" /> </div>
       <div className={hasObjectives ? "page-layout" : ""}>
         <div className={hasObjectives ? "form-wrapper app-container" : "app-container"}>
           <header className="app-header"><h1>OKR</h1></header>
@@ -135,7 +166,40 @@ function App() {
               <div className="form-group"><label htmlFor="managerEmail" className="required">Manager's Email Address</label><input type="email" id="managerEmail" name="managerEmail" value={formData.managerEmail} onChange={handleInputChange} placeholder="e.g., manager@company.com" required/></div>
               <div className="form-group"><label className="required">MLT Lead</label><Dropdown label="MLT Lead" options={mltLeadOptions} selected={formData.mltLead} onSelectedChange={(option) => handleDropdownChange('mltLead', option)} /></div>
               <div className="form-group"><label className="required">Objective</label><p className="field-description">Select all of the objectives that apply to your OKRs. Details will display below for you to choose the weight and granularity.</p><Dropdown label="Objective" options={objectiveOptions} selected={formData.objective} onSelectedChange={handleObjectiveChange} isMulti /></div>
-              {formData.objective.filter(obj => !obj.isHeader).map(obj => { const prefix = getPrefix(obj); const details = formData.objectiveDetails[obj.value] || {}; return ( <div key={obj.value} className="form-group conditional-group">{obj.category === 'Individual' && (<div className="inline-fields-container"><div className="field-item"><label htmlFor={`objectiveText-${obj.value}`} className="required">{prefix} {obj.label.trim()} - Objective</label><input type="text" id={`objectiveText-${obj.value}`} value={details.objectiveText} onChange={(e) => handleObjectiveDetailChange(obj.value, 'objectiveText', e.target.value)} placeholder="Define the specific goal" required/></div><div className="field-item"><label htmlFor={`weight-${obj.value}`} className="required">{prefix} {obj.label.trim()} - Weight (%)</label><input type="number" id={`weight-${obj.value}`} value={details.weight} onChange={(e) => handleObjectiveDetailChange(obj.value, 'weight', e.target.value)} placeholder="e.g., 20" required/></div></div>)}{obj.value === 'development_plan' && (<div className="field-item"><label htmlFor={`weight-${obj.value}`} className="required">{prefix} {obj.label.trim()} - Weight (%)</label><input type="number" id={`weight-${obj.value}`} value={details.weight} onChange={(e) => handleObjectiveDetailChange(obj.value, 'weight', e.target.value)} placeholder="e.g., 10" required/></div>)}{obj.category !== 'Individual' && obj.value !== 'development_plan' && (<div className="inline-fields-container"><div className="field-item"><label className="required">{prefix} {obj.label.trim()} - Filters</label><Dropdown label="Country" options={countryOptions} selected={details.filter} onSelectedChange={(option) => handleObjectiveDetailChange(obj.value, 'filter', option)} /></div><div className="field-item"><label htmlFor={`weight-${obj.value}`} className="required">{prefix} {obj.label.trim()} - Weight (%)</label><input type="number" id={`weight-${obj.value}`} value={details.weight} onChange={(e) => handleObjectiveDetailChange(obj.value, 'weight', e.target.value)} placeholder="e.g., 20" required/></div></div>)}</div> );})}
+              
+              {formData.objective.filter(obj => !obj.isHeader).map(obj => {
+                const prefix = getPrefix(obj);
+                const details = formData.objectiveDetails[obj.value] || {};
+                
+                // --- THIS IS THE KEY CHANGE IN THE JSX ---
+                // Render the standard filter/weight pair only if the objective is not special cased
+                const isStandardFilterObjective = obj.category !== 'Individual' && obj.value !== 'development_plan';
+
+                return (
+                  <div key={obj.value} className="form-group conditional-group">
+                    {obj.category === 'Individual' && (<div className="inline-fields-container"><div className="field-item"><label htmlFor={`objectiveText-${obj.value}`} className="required">{prefix} {obj.label.trim()} - Objective</label><input type="text" id={`objectiveText-${obj.value}`} value={details.objectiveText} onChange={(e) => handleObjectiveDetailChange(obj.value, 'objectiveText', e.target.value)} placeholder="Define the specific goal" required/></div><div className="field-item"><label htmlFor={`weight-${obj.value}`} className="required">{prefix} {obj.label.trim()} - Weight (%)</label><input type="number" id={`weight-${obj.value}`} value={details.weight} onChange={(e) => handleObjectiveDetailChange(obj.value, 'weight', e.target.value)} placeholder="e.g., 20" required/></div></div>)}
+                    {obj.value === 'development_plan' && (<div className="field-item"><label htmlFor={`weight-${obj.value}`} className="required">{prefix} {obj.label.trim()} - Weight (%)</label><input type="number" id={`weight-${obj.value}`} value={details.weight} onChange={(e) => handleObjectiveDetailChange(obj.value, 'weight', e.target.value)} placeholder="e.g., 10" required/></div>)}
+                    {isStandardFilterObjective && (
+                      <div className="inline-fields-container">
+                        <div className="field-item">
+                          <label className="required">{prefix} {obj.label.trim()} - Filters</label>
+                          <Dropdown
+                            label="Filter"
+                            options={getFilterOptionsForObjective(obj)}
+                            selected={details.filter}
+                            onSelectedChange={(option) => handleObjectiveDetailChange(obj.value, 'filter', option)}
+                          />
+                        </div>
+                        <div className="field-item">
+                          <label htmlFor={`weight-${obj.value}`} className="required">{prefix} {obj.label.trim()} - Weight (%)</label>
+                          <input type="number" id={`weight-${obj.value}`} value={details.weight} onChange={(e) => handleObjectiveDetailChange(obj.value, 'weight', e.target.value)} placeholder="e.g., 20" required/>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+              
               <div className="submit-container">
                 <p className="submit-description">A copy of your responses will be automatically sent to you and your manager when you submit.</p>
                 <div className="submit-feedback-container">
