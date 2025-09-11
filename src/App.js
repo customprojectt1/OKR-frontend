@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import './App.css';
 import SummaryBox from './SummaryBox';
 import Dropdown from './Dropdown';
-import { mltLeadOptions, objectiveOptions, countryOptions } from './Data/formOptions';
+import { mltLeadOptions, objectiveOptions, countryOptions } from './Data/formOptions'; // Corrected path
+import axios from 'axios'; // <-- IMPORT AXIOS
 
 const initialFormState = {
   yourName: '',
@@ -17,10 +18,10 @@ const initialFormState = {
 
 function App() {
   const [formData, setFormData] = useState(initialFormState);
-  const [submissionStatus, setSubmissionStatus] = useState('idle');
+  const [submissionStatus, setSubmissionStatus] = useState('idle'); // idle | submitting | success | error
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  // --- Handlers remain the same ---
+  // --- All your other functions remain exactly the same ---
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -38,15 +39,10 @@ function App() {
   const handleObjectiveDetailChange = (objectiveValue, fieldName, value) => {
     setFormData(prev => ({ ...prev, objectiveDetails: { ...prev.objectiveDetails, [objectiveValue]: { ...prev.objectiveDetails[objectiveValue], [fieldName]: value } } }));
   };
-
-  // --- Helpers remain the same ---
   const getPrefix = (objective) => {
     const categoryMap = { 'Brand': 'B', 'Demand': 'D', 'Digital': 'DM', 'Comms': 'C', 'Ops': 'O', 'People': 'P', 'Individual': '' };
     const prefix = categoryMap[objective.category] || '';
-    if (prefix === '') {
-        const index = objective.value.slice(-1);
-        return `${index}.`;
-    }
+    if (prefix === '') { const index = objective.value.slice(-1); return `${index}.`; }
     const categoryItems = formData.objective.filter(o => o.category === objective.category && !o.isHeader);
     const itemIndex = categoryItems.findIndex(o => o.value === objective.value);
     return `${prefix}${itemIndex + 1}.`;
@@ -57,26 +53,21 @@ function App() {
     return sum + parseFloat(weight || '0');
   }, 0);
 
-  // --- UPDATED: handleSubmit function with comprehensive validation ---
+  // --- UPDATED: handleSubmit function to use Axios and .env variable ---
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    // --- NEW VALIDATION LOGIC ---
-    const missingFields = [];
     
-    // 1. Check static fields
+    // Your excellent validation logic remains unchanged
+    const missingFields = [];
     if (!formData.yourName.trim()) missingFields.push("Your Name");
     if (!formData.yourEmail.trim()) missingFields.push("Your Email Address");
     if (!formData.managerEmail.trim()) missingFields.push("Manager's Email Address");
     if (!formData.mltLead) missingFields.push("MLT Lead");
     if (formData.objective.length === 0) missingFields.push("At least one Objective");
-
-    // 2. Check dynamic fields for each selected objective
     formData.objective.forEach(obj => {
       if (obj.isHeader) return;
       const details = formData.objectiveDetails[obj.value] || {};
       const prefix = getPrefix(obj) + " " + obj.label.trim();
-
       if (obj.category === 'Individual') {
         if (!details.objectiveText || !details.objectiveText.trim()) missingFields.push(`${prefix} - Objective`);
         if (!details.weight) missingFields.push(`${prefix} - Weight (%)`);
@@ -87,40 +78,41 @@ function App() {
         if (!details.weight) missingFields.push(`${prefix} - Weight (%)`);
       }
     });
-    
-    // 3. If there are missing fields, show an alert and stop
     if (missingFields.length > 0) {
-      const errorMessage = "Please fill out the following required fields:\n\n" + missingFields.map(field => `- ${field}`).join('\n');
-      alert(errorMessage);
+      alert("Please fill out the following required fields:\n\n" + missingFields.map(field => `- ${field}`).join('\n'));
       return;
     }
-
-    // 4. Check total weight (this now runs only if all fields are filled)
     if (totalWeight !== 100) {
       alert("Total weight must be exactly 100% to submit.");
       return;
     }
 
-    // --- End of new validation logic ---
-
     setSubmissionStatus('submitting');
+    
+    // Use the .env variable and the correct endpoint from your server.js
+    const apiUrl = `${process.env.REACT_APP_API_URL}/api/submit-form`;
+
     try {
-      const response = await fetch('http://localhost:8080/api/submit-form', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-      if (!response.ok) {
-        throw new Error('Server responded with an error.');
+      // Use axios to send the data
+      const response = await axios.post(apiUrl, formData);
+
+      // Check for a successful response from the server
+      if (response.status === 200) {
+        setSubmissionStatus('success');
+        setShowSuccessModal(true); // Show your success modal
+        setFormData(initialFormState); // Reset the form
+        
+        // Optional: Reset the status back to idle after a few seconds
+        setTimeout(() => setSubmissionStatus('idle'), 4000);
+      } else {
+        // Handle cases where the server responds with an error status code
+        throw new Error(`Server responded with status: ${response.status}`);
       }
-      setSubmissionStatus('success');
-      setShowSuccessModal(true);
-      setFormData(initialFormState);
-      setTimeout(() => setSubmissionStatus('idle'), 4000);
     } catch (error) {
       setSubmissionStatus('error');
-      console.error("SUBMISSION FAILED:", error);
-      alert("An error occurred while submitting the form. Please try again.");
+      console.error("SUBMISSION FAILED:", error.response ? error.response.data : error.message);
+      alert("An error occurred while submitting the form. Please check the console for details.");
+      // Reset to idle so the user can try again
       setSubmissionStatus('idle');
     }
   };
@@ -129,7 +121,7 @@ function App() {
 
   return (
     <div>
-      {/* The rest of the JSX is exactly the same as before */}
+      {/* The rest of your JSX is exactly the same as before */}
       <div className="logo-container">
         <img src="/Logo/JLL logo negative - RGB.png" alt="Company Logo" />
       </div>
