@@ -135,7 +135,7 @@ function App() {
       </div>
       <div className={hasObjectives ? "page-layout" : ""}>
         <div className={hasObjectives ? "form-wrapper app-container" : "app-container"}>
-          <header className="app-header"><h1>Company Data Entry Form</h1></header>
+          <header className="app-header"><h1>OKR</h1></header>
           <main className="form-container">
             <form onSubmit={handleSubmit}>
               <div className="form-group"><label htmlFor="yourName" className="required">Your Name</label><input type="text" id="yourName" name="yourName" value={formData.yourName} onChange={handleInputChange} placeholder="Enter your full name" required/></div>
