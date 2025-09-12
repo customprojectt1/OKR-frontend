@@ -1,16 +1,28 @@
 // src/SummaryBox.js
+
 import React from 'react';
-import './SummaryBox.css'; // We will create this file next
+import './SummaryBox.css';
+// NEW: Import the master sort order
+import { objectiveSortOrder } from './Data/formOptions';
 
 const SummaryBox = ({ selectedObjectives, objectiveDetails }) => {
-  // If no objectives are selected, don't render anything.
   if (selectedObjectives.length === 0) {
     return null;
   }
   
-  // Calculate the total weight
+  // --- THIS IS THE KEY CHANGE ---
+  // Create a sorted version of the selected objectives
+  const sortedObjectives = [...selectedObjectives].sort((a, b) => {
+    // Find the index (position) of each objective in our master sort order list
+    const indexA = objectiveSortOrder.indexOf(a.value);
+    const indexB = objectiveSortOrder.indexOf(b.value);
+    
+    // The sort function returns a negative, zero, or positive value
+    return indexA - indexB;
+  });
+
   const totalWeight = selectedObjectives.reduce((sum, obj) => {
-    const weight = objectiveDetails[obj.value]?.weight || 0;
+    const weight = objectiveDetails[obj.value]?.weight || '0';
     return sum + parseFloat(weight);
   }, 0);
 
@@ -26,14 +38,14 @@ const SummaryBox = ({ selectedObjectives, objectiveDetails }) => {
           </tr>
         </thead>
         <tbody>
-          {selectedObjectives.map(obj => {
+          {/* We now map over the NEW sortedObjectives array instead of the original one */}
+          {sortedObjectives.map(obj => {
             const details = objectiveDetails[obj.value] || {};
-            
             let detailContent = details.filter?.label || 'N/A';
             if (obj.category === 'Individual') {
               detailContent = details.objectiveText || '-';
             } else if (obj.value === 'development_plan') {
-                detailContent = 'N/A';
+              detailContent = 'N/A';
             }
 
             return (

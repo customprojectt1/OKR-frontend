@@ -10,6 +10,8 @@ import axios from 'axios';
 import {
   mltLeadOptions,
   objectiveOptions,
+  // NEW: Import the master sort order for the form itself
+  objectiveSortOrder,
   brandFilters,
   marketingOriginatedRevenueFilters,
   propertyMarketingFilters,
@@ -33,7 +35,6 @@ const initialFormState = {
   objectiveDetails: {}
 };
 
-// This "brain" maps a specific objective's 'value' to the correct filter array
 const filterOptionsMap = {
   'brand_awareness': brandFilters,
   'brand_familiarity': brandFilters,
@@ -54,7 +55,6 @@ const filterOptionsMap = {
   'event_success': eventSuccessFilters,
   'coe_usage': coeUsageFilters,
   'people_survey_engagement': peopleSurveyFilters,
-  // 'development_plan' has no filter, so it's not needed here
 };
 
 
@@ -63,7 +63,7 @@ function App() {
   const [submissionStatus, setSubmissionStatus] = useState('idle');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  // --- All handler functions remain the same ---
+  // --- All handler and helper functions remain the same ---
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -95,14 +95,13 @@ function App() {
     return sum + parseFloat(weight || '0');
   }, 0);
 
-  // Helper function to get the correct filter options using the map
   const getFilterOptionsForObjective = (objective) => {
-    return filterOptionsMap[objective.value] || []; // Return the mapped list or an empty list
+    return filterOptionsMap[objective.value] || [];
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // Your validation logic is perfect and does not need to change
+    // ... (Your validation logic remains exactly the same)
     const missingFields = [];
     if (!formData.yourName.trim()) missingFields.push("Your Name");
     if (!formData.yourEmail.trim()) missingFields.push("Your Email Address");
@@ -152,9 +151,16 @@ function App() {
 
   const hasObjectives = formData.objective.length > 0;
 
+  // --- THIS IS THE KEY CHANGE ---
+  // Create a sorted copy of the selected objectives to use for rendering the form fields.
+  const sortedObjectivesForForm = [...formData.objective].sort((a, b) => {
+    const indexA = objectiveSortOrder.indexOf(a.value);
+    const indexB = objectiveSortOrder.indexOf(b.value);
+    return indexA - indexB;
+  });
+
   return (
     <div>
-      {/* ... Your JSX for logo, layout, and form remains here ... */}
       <div className="logo-container"> <img src="/Logo/JLL logo negative - RGB.png" alt="Company Logo" /> </div>
       <div className={hasObjectives ? "page-layout" : ""}>
         <div className={hasObjectives ? "form-wrapper app-container" : "app-container"}>
@@ -167,12 +173,10 @@ function App() {
               <div className="form-group"><label className="required">MLT Lead</label><Dropdown label="MLT Lead" options={mltLeadOptions} selected={formData.mltLead} onSelectedChange={(option) => handleDropdownChange('mltLead', option)} /></div>
               <div className="form-group"><label className="required">Objective</label><p className="field-description">Select all of the objectives that apply to your OKRs. Details will display below for you to choose the weight and granularity.</p><Dropdown label="Objective" options={objectiveOptions} selected={formData.objective} onSelectedChange={handleObjectiveChange} isMulti /></div>
               
-              {formData.objective.filter(obj => !obj.isHeader).map(obj => {
+              {/* We now map over the NEW sorted array instead of the original one */}
+              {sortedObjectivesForForm.filter(obj => !obj.isHeader).map(obj => {
                 const prefix = getPrefix(obj);
                 const details = formData.objectiveDetails[obj.value] || {};
-                
-                // --- THIS IS THE KEY CHANGE IN THE JSX ---
-                // Render the standard filter/weight pair only if the objective is not special cased
                 const isStandardFilterObjective = obj.category !== 'Individual' && obj.value !== 'development_plan';
 
                 return (
