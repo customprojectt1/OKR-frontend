@@ -2,7 +2,6 @@
 
 import React from 'react';
 import './SummaryBox.css';
-// NEW: Import the master sort order
 import { objectiveSortOrder } from './Data/formOptions';
 
 const SummaryBox = ({ selectedObjectives, objectiveDetails }) => {
@@ -10,14 +9,9 @@ const SummaryBox = ({ selectedObjectives, objectiveDetails }) => {
     return null;
   }
   
-  // --- THIS IS THE KEY CHANGE ---
-  // Create a sorted version of the selected objectives
   const sortedObjectives = [...selectedObjectives].sort((a, b) => {
-    // Find the index (position) of each objective in our master sort order list
     const indexA = objectiveSortOrder.indexOf(a.value);
     const indexB = objectiveSortOrder.indexOf(b.value);
-    
-    // The sort function returns a negative, zero, or positive value
     return indexA - indexB;
   });
 
@@ -26,9 +20,31 @@ const SummaryBox = ({ selectedObjectives, objectiveDetails }) => {
     return sum + parseFloat(weight);
   }, 0);
 
+  const percentageLeft = Math.round(100 - totalWeight);
+
   return (
     <div className="summary-box">
       <h2>Summary</h2>
+
+      <div className="summary-goal-tracker">
+        {totalWeight > 0 && totalWeight < 100 && (
+          <p className="goal-pending">
+            You have <strong>{percentageLeft}%</strong> left to reach 100%.
+          </p>
+        )}
+        {totalWeight === 100 && (
+          <p className="goal-reached">
+            🎉 Goal Reached! Total weight is 100%.
+          </p>
+        )}
+        {/* --- MOVED: The weight-warning is now here --- */}
+        {totalWeight > 100 && (
+          <p className="weight-warning">
+            Total weight cannot exceed 100%.
+          </p>
+        )}
+      </div>
+
       <table>
         <thead>
           <tr>
@@ -38,7 +54,6 @@ const SummaryBox = ({ selectedObjectives, objectiveDetails }) => {
           </tr>
         </thead>
         <tbody>
-          {/* We now map over the NEW sortedObjectives array instead of the original one */}
           {sortedObjectives.map(obj => {
             const details = objectiveDetails[obj.value] || {};
             let detailContent = details.filter?.label || 'N/A';
@@ -47,7 +62,6 @@ const SummaryBox = ({ selectedObjectives, objectiveDetails }) => {
             } else if (obj.value === 'development_plan') {
               detailContent = 'N/A';
             }
-
             return (
               <tr key={obj.value}>
                 <td>{obj.label.trim()}</td>
@@ -60,15 +74,15 @@ const SummaryBox = ({ selectedObjectives, objectiveDetails }) => {
         <tfoot>
           <tr>
             <td colSpan="2">Total Weight</td>
+            {/* The class here still works perfectly to make the number red */}
             <td className={totalWeight > 100 ? 'weight-over' : ''}>
               {totalWeight}%
             </td>
           </tr>
         </tfoot>
       </table>
-       {totalWeight > 100 && (
-        <p className="weight-warning">Total weight cannot exceed 100%.</p>
-      )}
+
+      {/* --- REMOVED: The old warning message location is now empty --- */}
     </div>
   );
 };

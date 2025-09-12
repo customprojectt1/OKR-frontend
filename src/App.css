@@ -1,241 +1,121 @@
 /* src/App.css */
 
-.app-container {
-  max-width: 800px;
-  margin: 40px auto; /* Add more margin at the top */
-  background-color: #fff;
-  color: #333; /* Reset text color for the white container */
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  padding: 20px 40px;
-}
+/* --- Logo and Main Layout --- */
+.logo-container { display: flex; justify-content: center; align-items: center; margin-bottom: 50px; }
+.logo-container img { max-width: 120px; height: auto; }
 
-.app-header h1 {
-  color: #003E51; /* Use our theme color for the heading */
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.form-container {
-  margin-top: 20px;
-}
-
-.form-group {
-  margin-bottom: 25px; /* Increase spacing between form fields */
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: bold;
-  font-size: 1rem;
-  color: #555;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box; /* Ensures padding doesn't affect the final width */
-  font-size: 1rem;
-}
-
-.form-group input:focus {
-  border-color: #0073B1; /* A nice highlight color on focus */
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(0, 115, 177, 0.2);
-}
-.conditional-group {
-  background-color: #f4f5f7;
-  border-left: 4px solid #0073B1;
-  padding: 15px 20px;
-  margin-left: 10px;
-  border-radius: 4px;
-}
-
-.inline-fields-container {
-  display: flex;
-  gap: 20px; /* Puts space between the two items */
-  align-items: flex-start; /* Aligns the tops of the labels together */
-}
-
-.field-item {
-  flex: 1; /* Each item will take up an equal amount of the available space */
-  min-width: 0; /* Prevents shrinking issues in flexbox */
-}
-
-.inline-fields-container .form-group {
-  margin-bottom: 0;
-}
-
+/* --- DEFINITIVE: Layout for Independent Scrolling --- */
 .page-layout {
   display: flex;
-  gap: 30px; /* Space between the form and the summary box */
-  align-items: flex-start; /* Aligns the tops of the boxes */
+  gap: 30px;
+  align-items: flex-start;
   max-width: 1200px;
   margin: 0 auto;
+  height: calc(100vh - 100px); /* Fixed height for the layout container */
 }
-
 .form-wrapper {
-  flex: 2; /* The form will take up 2/3 of the space */
+  flex: 2;
   min-width: 0;
+  height: 100%; /* Occupy full height of parent */
+  overflow-y: auto; /* Enable scrolling on the form wrapper */
+  padding-right: 15px; /* Space for the scrollbar */
 }
-
 .summary-wrapper {
-  flex: 1; /* The summary will take up 1/3 of the space */
+  flex: 1;
   position: sticky;
   top: 40px;
+  height: calc(100vh - 80px); /* Set height for sticky positioning and scrolling */
+  overflow-y: auto; /* Enable scrolling on the summary wrapper */
 }
 
-.submit-container {
-  margin-top: 40px;
-  text-align: center; /* Centers the button */
-  border-top: 1px solid #e0e0e0;
-  padding-top: 30px;
+/* --- Form Container & Header --- */
+.app-container {
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #fff;
+  color: #333;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  padding: 30px 50px;
 }
+.app-header h1 { color: #003E51; text-align: center; margin-bottom: 40px; font-weight: 500; font-size: 1.8rem; }
 
-.submit-btn {
-  background-color: #0073B1;
-  color: white;
-  padding: 12px 30px;
-  border: none;
-  border-radius: 5px;
-  font-size: 1.1rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.1s ease;
-}
+/* --- Form Group and Label Styles --- */
+.form-container { margin-top: 20px; }
+.form-group { margin-bottom: 30px; }
+.form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.95rem; color: #444; }
+.form-group label.required::after { content: " *"; color: #d9534f; }
 
-.submit-btn:hover:not(:disabled) {
-  background-color: #005a8c;
-}
+/* --- Input Field Styles --- */
+.form-group input { width: 100%; padding: 12px 16px; border: 1px solid #e0e0e0; border-radius: 5px; box-sizing: border-box; font-size: 1rem; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; transition: border-color 0.2s, box-shadow 0.2s; background-color: #f9f9f9; }
+.form-group input:focus { border-color: #0073B1; background-color: #fff; outline: none; box-shadow: 0 0 0 3px rgba(0, 115, 177, 0.15); }
 
-.submit-btn:active:not(:disabled) {
-  transform: scale(0.98); /* Gives a slight press-down effect */
-}
+/* --- Email Icon Styles --- */
+.input-with-icon { position: relative; }
+.input-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #888; pointer-events: none; }
+.input-with-icon input { padding-left: 45px; }
 
-.submit-btn:disabled {
-  background-color: #ccc;
-  color: #666;
-  cursor: not-allowed;
-}
+/* --- Divider and Descriptions --- */
+.form-divider { border: none; border-top: 1px solid #eeeeee; margin: 40px 0; }
+.field-description { font-size: 0.85rem; color: #777; margin-top: -4px; margin-bottom: 10px; }
 
-.weight-helper-text {
-  margin-top: 15px;
-  font-size: 0.9em;
-  color: #d9534f; /* Make the warning text red */
+/* --- Conditional and Inline Fields --- */
+.conditional-group { background-color: #f4f5f7; border-left: 4px solid #0073B1; padding: 15px 20px; margin-left: 10px; border-radius: 4px; }
+.inline-fields-container { 
+  display: flex; 
+  gap: 20px; 
+  align-items: stretch; 
 }
-
-.form-group label.required::after {
-  content: " *";
-  color: #d9534f; /* Red */
-}
-
-.field-description {
-  font-size: 0.9em;
-  color: #666;
-  margin-top: -8px; /* Pulls the text closer to the label above it */
-  margin-bottom: 15px;
-}
-
-.submit-description {
-  font-size: 0.9em;
-  color: #666;
-  margin-bottom: 20px; /* Adds space between the text and the button */
-}
-.logo-container {
+.field-item { 
+  flex: 1; 
+  min-width: 0;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 24px; /* Creates space between the logo and the form */
+  flex-direction: column;
 }
-
-.logo-container img {
-  max-width: 180px; /* Adjust this value to make the logo bigger or smaller */
-  height: auto; /* Maintains the aspect ratio of the logo */
+.field-item > input,
+.field-item > .dropdown-container {
+  margin-top: auto;
 }
+.inline-fields-container .form-group { margin-bottom: 0; }
 
-/* --- NEW: Success Indicator and Modal Styles --- */
+/* --- Submit Container and Description --- */
+.submit-container { margin-top: 20px; text-align: center; padding-top: 20px; }
+.submit-description { font-size: 0.9rem; font-weight: 400; color: #555; text-align: center; margin-bottom: 30px; padding: 0 20px; }
 
-.submit-feedback-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 15px; /* Space between the button and the icon */
+/* --- Buttons, Modal, etc. --- */
+.submit-btn { background-color: #0073B1; color: white; padding: 12px 30px; border: none; border-radius: 5px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease, transform 0.1s ease; }
+.submit-btn:hover:not(:disabled) { background-color: #005a8c; }
+.submit-btn:active:not(:disabled) { transform: scale(0.98); }
+.submit-btn:disabled { background-color: #ccc; color: #666; cursor: not-allowed; }
+.weight-helper-text { margin-top: 15px; font-size: 0.9em; color: #d9534f; }
+.submit-feedback-container { display: flex; justify-content: center; align-items: center; gap: 15px; }
+.success-checkmark { display: inline-block; width: 30px; height: 30px; border-radius: 50%; background-color: #28a745; position: relative; animation: fadeIn 0.5s ease-in-out; }
+.success-checkmark::after { content: ''; position: absolute; left: 10px; top: 6px; width: 7px; height: 13px; border: solid white; border-width: 0 3px 3px 0; transform: rotate(45deg); }
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 2000; }
+.modal-content { background-color: white; padding: 30px 40px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); text-align: center; max-width: 400px; }
+.modal-content h2 { color: #28a745; margin-top: 0; }
+.modal-content p { color: #555; }
+.modal-close-btn { margin-top: 20px; background-color: #0073B1; color: white; padding: 10px 25px; border: none; border-radius: 5px; font-size: 1rem; cursor: pointer; transition: background-color 0.2s; }
+.modal-close-btn:hover { background-color: #005a8c; }
+
+/* --- Custom Scrollbar for Webkit Browsers --- */
+.form-wrapper::-webkit-scrollbar,
+.summary-wrapper::-webkit-scrollbar {
+  width: 8px;
 }
-
-.success-checkmark {
-  display: inline-block;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background-color: #28a745; /* Green */
-  position: relative;
-  animation: fadeIn 0.5s ease-in-out;
+.form-wrapper::-webkit-scrollbar-track,
+.summary-wrapper::-webkit-scrollbar-track {
+  background: #e9e9e9;
+  border-radius: 10px;
 }
-
-.success-checkmark::after {
-  content: '';
-  position: absolute;
-  left: 10px;
-  top: 6px;
-  width: 7px;
-  height: 13px;
-  border: solid white;
-  border-width: 0 3px 3px 0;
-  transform: rotate(45deg);
+.form-wrapper::-webkit-scrollbar-thumb,
+.summary-wrapper::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
 }
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.5); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-/* Modal Styles */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-}
-
-.modal-content {
-  background-color: white;
-  padding: 30px 40px;
-  border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-  text-align: center;
-  max-width: 400px;
-}
-
-.modal-content h2 {
-  color: #28a745;
-  margin-top: 0;
-}
-
-.modal-content p {
-  color: #555;
-}
-
-.modal-close-btn {
-  margin-top: 20px;
-  background-color: #0073B1;
-  color: white;
-  padding: 10px 25px;
-  border: none;
-  border-radius: 5px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.modal-close-btn:hover {
-  background-color: #005a8c;
+.form-wrapper::-webkit-scrollbar-thumb:hover,
+.summary-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
