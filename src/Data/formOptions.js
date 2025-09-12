@@ -94,7 +94,46 @@ export const campaignROIFilters = [
 ];
 
 // (O3.Event Success-Filters)
-export const eventSuccessFilters = budgetAccuracyFilters.filter(o => o.value !== 'total_mie'); // Same as budget, just without "Total MIE"
+// src/data/formOptions.js
+
+export const eventSuccessFilters = [
+  { value: 'global', label: 'Global' },
+  { value: 'us', label: 'US' },
+  { value: 'canada', label: 'Canada' },
+  { value: 'brazil', label: 'Brazil' },
+  { value: 'mexico', label: 'Mexico' },
+  { value: 'greater_latam', label: 'Greater LATAM' },
+  { value: 'uk', label: 'UK' },
+  { value: 'germany', label: 'Germany' },
+  { value: 'france', label: 'France' },
+  { value: 'spain', label: 'Spain' },
+  { value: 'mena', label: 'MENA' },
+  { value: 'netherlands', label: 'Netherlands' },
+  { value: 'bellux', label: 'Bellux' },
+  { value: 'sweden', label: 'Sweden' },
+  { value: 'poland', label: 'Poland' },
+  { value: 'ireland', label: 'Ireland' },
+  { value: 'italy', label: 'Italy' },
+  { value: 'portugal', label: 'Portugal' },
+  { value: 'switzerland', label: 'Switzerland' },
+  { value: 'africa', label: 'Africa' },
+  { value: 'finland', label: 'Finland' },
+  { value: 'australia', label: 'Australia' },
+  { value: 'new_zealand', label: 'New Zealand' },
+  { value: 'greater_china', label: 'Greater China' },
+  { value: 'hong_kong', label: 'Hong Kong' },
+  { value: 'india', label: 'India' },
+  { value: 'japan', label: 'Japan' },
+  { value: 'korea', label: 'Korea' },
+  { value: 'sea_singapore', label: 'SEA-Singapore' },
+  { value: 'sea_philippines', label: 'SEA-Philippines' },
+  { value: 'sea_indonesia', label: 'SEA-Indonesia' },
+  { value: 'sea_vietnam', label: 'SEA-Vietnam' },
+  { value: 'sea_thailand', label: 'SEA-Thailand' },
+  { value: 'sea_malaysia', label: 'SEA-Malaysia' }
+];
+
+// Same as budget, just without "Total MIE"
 
 // (O4.Marketing Services COE Usage-Filters)
 export const coeUsageFilters = [
