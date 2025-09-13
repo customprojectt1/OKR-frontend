@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './Dropdown.css'; // We will update this file next
+import './Dropdown.css';
 
 const Dropdown = ({ label, options, selected, onSelectedChange, isMulti = false }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,24 +19,25 @@ const Dropdown = ({ label, options, selected, onSelectedChange, isMulti = false 
 
   const handleOptionClick = (option) => {
     if (!isMulti) {
-      // --- Single-select logic ---
       onSelectedChange(option);
       setIsOpen(false);
     } else {
-      // --- Multi-select logic ---
       let newSelected;
       if (selected.some(item => item.value === option.value)) {
-        // If already selected, remove it
         newSelected = selected.filter(item => item.value !== option.value);
       } else {
-        // If not selected, add it
         newSelected = [...selected, option];
       }
       onSelectedChange(newSelected);
     }
   };
 
-  // --- Renders the header content ---
+  // NEW: Handler for the "Clear All" button
+  const handleClearAll = (e) => {
+    e.stopPropagation(); // Prevent the dropdown from opening/closing
+    onSelectedChange([]); // Set the selection to an empty array
+  };
+
   const renderHeader = () => {
     if (isMulti) {
       if (selected.length === 0) {
@@ -46,14 +47,8 @@ const Dropdown = ({ label, options, selected, onSelectedChange, isMulti = false 
         <div className="dropdown-header-tags">
           {selected.map(option => (
             <div key={option.value} className="tag-item">
-              {option.label}
-              <span
-                className="tag-remove"
-                onClick={(e) => {
-                  e.stopPropagation(); // Prevents dropdown from opening/closing
-                  handleOptionClick(option);
-                }}
-              >
+              {option.label.trim()}
+              <span className="tag-remove" onClick={(e) => { e.stopPropagation(); handleOptionClick(option); }}>
                 &times;
               </span>
             </div>
@@ -61,7 +56,6 @@ const Dropdown = ({ label, options, selected, onSelectedChange, isMulti = false 
         </div>
       );
     }
-    // For single-select
     return selected ? selected.label : `Select ${label}`;
   };
 
@@ -69,21 +63,20 @@ const Dropdown = ({ label, options, selected, onSelectedChange, isMulti = false 
     <div className="dropdown-container" ref={dropdownRef}>
       <div className="dropdown-header" onClick={() => setIsOpen(!isOpen)}>
         {renderHeader()}
-        <span className={`dropdown-arrow ${isOpen ? 'open' : ''}`}>&#9660;</span>
+        <div className="dropdown-controls">
+          {isMulti && selected.length > 0 && (
+            <span className="clear-all" onClick={handleClearAll}>&times;</span>
+          )}
+          <span className={`dropdown-arrow ${isOpen ? 'open' : ''}`}>&#9660;</span>
+        </div>
       </div>
       {isOpen && (
         <div className="dropdown-list-container">
           <ul className="dropdown-list">
             {options.map((option) => {
-              const isSelected = isMulti
-                ? selected.some(item => item.value === option.value)
-                : selected?.value === option.value;
+              const isSelected = isMulti ? selected.some(item => item.value === option.value) : selected?.value === option.value;
               return (
-                <li
-                  key={option.value}
-                  className={`dropdown-list-item ${isSelected ? 'selected' : ''}`}
-                  onClick={() => handleOptionClick(option)}
-                >
+                <li key={option.value} className={`dropdown-list-item ${isSelected ? 'selected' : ''} ${option.isHeader ? 'is-header' : ''}`} onClick={() => !option.isHeader && handleOptionClick(option)}>
                   {option.label}
                 </li>
               );

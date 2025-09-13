@@ -4,35 +4,10 @@
 .logo-container { display: flex; justify-content: center; align-items: center; margin-bottom: 50px; }
 .logo-container img { max-width: 120px; height: auto; }
 
-/* --- DEFINITIVE: Layout for Independent Scrolling --- */
-.page-layout {
-  display: flex;
-  gap: 30px;
-  align-items: flex-start;
-  max-width: 1200px;
-  margin: 0 auto;
-  height: calc(100vh - 100px); /* Fixed height for the layout container */
-}
-.form-wrapper {
-  flex: 2;
-  min-width: 0;
-  height: 100%; /* Occupy full height of parent */
-  overflow-y: auto; /* Enable scrolling on the form wrapper */
-  padding-right: 15px; /* Space for the scrollbar */
-}
-.summary-wrapper {
-  flex: 1;
-  position: sticky;
-  top: 40px;
-  height: calc(100vh - 80px); /* Set height for sticky positioning and scrolling */
-  overflow-y: auto; /* Enable scrolling on the summary wrapper */
-}
-
 /* --- Form Container & Header --- */
 .app-container {
-  max-width: 700px;
-  margin-left: auto;
-  margin-right: auto;
+  max-width: 900px;
+  margin: 40px auto;
   background-color: #fff;
   color: #333;
   border-radius: 12px;
@@ -41,49 +16,53 @@
 }
 .app-header h1 { color: #003E51; text-align: center; margin-bottom: 40px; font-weight: 500; font-size: 1.8rem; }
 
-/* --- Form Group and Label Styles --- */
+/* --- Standard Form Group and Label Styles --- */
 .form-container { margin-top: 20px; }
 .form-group { margin-bottom: 30px; }
 .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.95rem; color: #444; }
 .form-group label.required::after { content: " *"; color: #d9534f; }
 
-/* --- Input Field Styles --- */
+/* --- Standard Input Field Styles --- */
 .form-group input { width: 100%; padding: 12px 16px; border: 1px solid #e0e0e0; border-radius: 5px; box-sizing: border-box; font-size: 1rem; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; transition: border-color 0.2s, box-shadow 0.2s; background-color: #f9f9f9; }
 .form-group input:focus { border-color: #0073B1; background-color: #fff; outline: none; box-shadow: 0 0 0 3px rgba(0, 115, 177, 0.15); }
-
-/* --- Email Icon Styles --- */
 .input-with-icon { position: relative; }
 .input-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #888; pointer-events: none; }
 .input-with-icon input { padding-left: 45px; }
 
 /* --- Divider and Descriptions --- */
-.form-divider { border: none; border-top: 1px solid #eeeeee; margin: 40px 0; }
+.form-divider { border: none; border-top: 1px solid #eeeeee; }
 .field-description { font-size: 0.85rem; color: #777; margin-top: -4px; margin-bottom: 10px; }
 
-/* --- Conditional and Inline Fields --- */
-.conditional-group { background-color: #f4f5f7; border-left: 4px solid #0073B1; padding: 15px 20px; margin-left: 10px; border-radius: 4px; }
-.inline-fields-container { 
-  display: flex; 
-  gap: 20px; 
-  align-items: stretch; 
-}
-.field-item { 
-  flex: 1; 
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-}
-.field-item > input,
-.field-item > .dropdown-container {
-  margin-top: auto;
-}
-.inline-fields-container .form-group { margin-bottom: 0; }
+/* --- Objective Row Layout --- */
+.objective-row { display: flex; align-items: center; gap: 20px; padding: 20px 0; border-bottom: 1px solid #f0f0f0; }
+.objective-row:last-child { border-bottom: none; }
+.objective-name { flex: 1; font-weight: 600; color: #333; font-size: 1rem; }
+.objective-name .prefix { color: #0073B1; font-weight: 700; margin-right: 8px; }
+.objective-input-group { display: flex; gap: 20px; flex-basis: 50%; align-items: center; }
+.objective-input { flex: 1; }
+.objective-input input, .objective-input .dropdown-container .dropdown-header { padding: 10px 14px; font-size: 0.95rem; }
+
+/* --- NEW: Styles for the Weight Input with a Percent Sign --- */
+.input-with-unit { position: relative; }
+.input-unit { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: #888; pointer-events: none; font-weight: 500; }
+.input-with-unit input[type="number"] { padding-right: 40px; }
+.input-with-unit input[type="number"] { -moz-appearance: textfield; }
+.input-with-unit input[type="number"]::-webkit-inner-spin-button,
+.input-with-unit input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* --- NEW: Styles for Goal Tracker below Objective Box --- */
+.summary-goal-tracker { text-align: center; margin-top: 15px; font-size: 0.95em; font-weight: 500; transition: all 0.3s ease; }
+.summary-goal-tracker p { margin: 0; padding: 10px; border-radius: 6px; }
+.goal-pending { color: #005a8c; background-color: #e9f5ff; border: 1px solid #b3d9f7; }
+.goal-pending strong { font-weight: 700; }
+.goal-reached { color: #2e7d32; background-color: #e8f5e9; border: 1px solid #a5d6a7; }
+.weight-warning { color: #a94442; background-color: #f2dede; border: 1px solid #ebccd1; }
 
 /* --- Submit Container and Description --- */
-.submit-container { margin-top: 20px; text-align: center; padding-top: 20px; }
+.submit-container { margin-top: 40px; text-align: center; padding-top: 30px; border-top: 1px solid #eeeeee; }
 .submit-description { font-size: 0.9rem; font-weight: 400; color: #555; text-align: center; margin-bottom: 30px; padding: 0 20px; }
 
-/* --- Buttons, Modal, etc. --- */
+/* --- All other styles (buttons, modal, etc.) remain the same --- */
 .submit-btn { background-color: #0073B1; color: white; padding: 12px 30px; border: none; border-radius: 5px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease, transform 0.1s ease; }
 .submit-btn:hover:not(:disabled) { background-color: #005a8c; }
 .submit-btn:active:not(:disabled) { transform: scale(0.98); }
@@ -99,23 +78,3 @@
 .modal-content p { color: #555; }
 .modal-close-btn { margin-top: 20px; background-color: #0073B1; color: white; padding: 10px 25px; border: none; border-radius: 5px; font-size: 1rem; cursor: pointer; transition: background-color 0.2s; }
 .modal-close-btn:hover { background-color: #005a8c; }
-
-/* --- Custom Scrollbar for Webkit Browsers --- */
-.form-wrapper::-webkit-scrollbar,
-.summary-wrapper::-webkit-scrollbar {
-  width: 8px;
-}
-.form-wrapper::-webkit-scrollbar-track,
-.summary-wrapper::-webkit-scrollbar-track {
-  background: #e9e9e9;
-  border-radius: 10px;
-}
-.form-wrapper::-webkit-scrollbar-thumb,
-.summary-wrapper::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 10px;
-}
-.form-wrapper::-webkit-scrollbar-thumb:hover,
-.summary-wrapper::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
-}

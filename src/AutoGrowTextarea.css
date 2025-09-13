@@ -1,0 +1,32 @@
+/* src/AutoGrowTextarea.css */
+
+.auto-grow-textarea {
+  /* Match the styles of our other input fields */
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+  
+  /* --- Auto-growing specific styles --- */
+  resize: none; /* Disable the user's manual resize handle */
+  overflow-y: hidden; /* Hide the scrollbar until the max-height is reached */
+  min-height: 42px; /* Set a minimum height equal to the single-line input */
+  max-height: 200px; /* The textarea will stop growing at this height */
+  box-sizing: border-box;
+}
+
+.auto-grow-textarea:focus {
+  border-color: #0073B1;
+  background-color: #fff;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 115, 177, 0.15);
+}
+
+/* When the textarea hits max-height, the overflow becomes auto to show the scrollbar */
+.auto-grow-textarea:not(textarea[style*="auto"]) {
+    overflow-y: auto;
+}

@@ -2,11 +2,9 @@
 
 import React, { useState } from 'react';
 import './App.css';
-import SummaryBox from './SummaryBox';
 import Dropdown from './Dropdown';
+import AutoGrowTextarea from './AutoGrowTextarea';
 import axios from 'axios';
-
-// Import all our specific option lists from the data file
 import {
   mltLeadOptions,
   objectiveOptions,
@@ -23,7 +21,7 @@ import {
   eventSuccessFilters,
   coeUsageFilters,
   peopleSurveyFilters,
-} from './Data/formOptions'; // Corrected path
+} from './Data/formOptions';
 
 const initialFormState = {
   yourName: '',
@@ -56,13 +54,12 @@ const filterOptionsMap = {
   'people_survey_engagement': peopleSurveyFilters,
 };
 
-
 function App() {
   const [formData, setFormData] = useState(initialFormState);
   const [submissionStatus, setSubmissionStatus] = useState('idle');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  // --- All handler and helper functions remain the same ---
+  // All handlers and helpers remain the same
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -93,13 +90,13 @@ function App() {
     const weight = formData.objectiveDetails[obj.value]?.weight;
     return sum + parseFloat(weight || '0');
   }, 0);
-
   const getFilterOptionsForObjective = (objective) => {
     return filterOptionsMap[objective.value] || [];
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    // Validation is the same
     const missingFields = [];
     if (!formData.yourName.trim()) missingFields.push("Your Name");
     if (!formData.yourEmail.trim()) missingFields.push("Your Email Address");
@@ -154,74 +151,71 @@ function App() {
     return indexA - indexB;
   });
 
+  const percentageLeft = Math.round(100 - totalWeight);
+
   return (
     <div>
       <div className="logo-container"> <img src="/Logo/JLL logo negative - RGB.png" alt="Company Logo" /> </div>
-      <div className={hasObjectives ? "page-layout" : ""}>
-        <div className={hasObjectives ? "form-wrapper app-container" : "app-container"}>
-          <header className="app-header"><h1>OKR</h1></header>
-          <main className="form-container">
-            <form onSubmit={handleSubmit}>
-              {/* --- STATIC FIELDS SECTION --- */}
-              <div className="form-group"><label htmlFor="yourName" className="required">Your Name</label><input type="text" id="yourName" name="yourName" value={formData.yourName} onChange={handleInputChange} required/></div>
-              
-              {/* UPDATED: Email field with icon */}
-              <div className="form-group">
-                <label htmlFor="yourEmail" className="required">Your Email Address</label>
-                <div className="input-with-icon">
-                  <svg className="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                  <input type="email" id="yourEmail" name="yourEmail" value={formData.yourEmail} onChange={handleInputChange} required/>
+      <div className="app-container">
+        <header className="app-header"><h1>OKR</h1></header>
+        <main className="form-container">
+          <form onSubmit={handleSubmit}>
+            <div className="form-group"><label htmlFor="yourName" className="required">Your Name</label><input type="text" id="yourName" name="yourName" value={formData.yourName} onChange={handleInputChange} placeholder="Enter your full name" required/></div>
+            <div className="form-group"><label htmlFor="yourEmail" className="required">Your Email Address</label><div className="input-with-icon"><svg className="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg><input type="email" id="yourEmail" name="yourEmail" value={formData.yourEmail} onChange={handleInputChange} required/></div></div>
+            <div className="form-group"><label htmlFor="managerEmail" className="required">Manager's Email Address</label><input type="email" id="managerEmail" name="managerEmail" value={formData.managerEmail} onChange={handleInputChange} required/></div>
+            <div className="form-group"><label className="required">MLT Lead</label><Dropdown label="MLT Lead" options={mltLeadOptions} selected={formData.mltLead} onSelectedChange={(option) => handleDropdownChange('mltLead', option)} /></div>
+            <div className="form-group"><label className="required">Objective</label><p className="field-description">Select all of the objectives that apply to your OKRs. Details will display below for you to choose the weight and granularity.</p><Dropdown label="Objective" options={objectiveOptions} selected={formData.objective} onSelectedChange={handleObjectiveChange} isMulti /></div>
+            
+            {hasObjectives && (
+              <>
+                {/* --- THIS IS THE NEW LOCATION FOR THE GOAL TRACKER --- */}
+                <div className="summary-goal-tracker">
+                  {totalWeight > 0 && totalWeight < 100 && (<p className="goal-pending">You have <strong>{percentageLeft}%</strong> left to reach 100%.</p>)}
+                  {totalWeight === 100 && (<p className="goal-reached">🎉 Goal Reached! Total weight is 100%.</p>)}
+                  {totalWeight > 100 && (<p className="weight-warning">Total weight cannot exceed 100%.</p>)}
                 </div>
-              </div>
+                
+                <hr className="form-divider" />
+                
+                <div className="objective-rows-container">
+                  {sortedObjectivesForForm.filter(obj => !obj.isHeader).map(obj => {
+                    const prefix = getPrefix(obj);
+                    const details = formData.objectiveDetails[obj.value] || {};
+                    const isStandardFilterObjective = obj.category !== 'Individual' && obj.value !== 'development_plan';
 
-              <div className="form-group"><label htmlFor="managerEmail" className="required">Manager's Email Address</label><input type="email" id="managerEmail" name="managerEmail" value={formData.managerEmail} onChange={handleInputChange} required/></div>
-              <div className="form-group"><label className="required">MLT Lead</label><Dropdown label="MLT Lead" options={mltLeadOptions} selected={formData.mltLead} onSelectedChange={(option) => handleDropdownChange('mltLead', option)} /></div>
-              <div className="form-group"><label className="required">Objective</label><p className="field-description">Select all of the objectives that apply to your OKRs. Details will display below for you to choose the weight and granularity.</p><Dropdown label="Objective" options={objectiveOptions} selected={formData.objective} onSelectedChange={handleObjectiveChange} isMulti /></div>
-              
-              {/* NEW: Divider added */}
-              <hr className="form-divider" />
-
-              {/* --- DYNAMIC FIELDS SECTION --- */}
-              {sortedObjectivesForForm.filter(obj => !obj.isHeader).map(obj => {
-                const prefix = getPrefix(obj);
-                const details = formData.objectiveDetails[obj.value] || {};
-                const isStandardFilterObjective = obj.category !== 'Individual' && obj.value !== 'development_plan';
-                return (
-                  <div key={obj.value} className="form-group conditional-group">
-                    {obj.category === 'Individual' && (<div className="inline-fields-container"><div className="field-item"><label htmlFor={`objectiveText-${obj.value}`} className="required">{prefix} {obj.label.trim()} - Objective</label><input type="text" id={`objectiveText-${obj.value}`} value={details.objectiveText} onChange={(e) => handleObjectiveDetailChange(obj.value, 'objectiveText', e.target.value)} placeholder="Define the specific goal" required/></div><div className="field-item"><label htmlFor={`weight-${obj.value}`} className="required">{prefix} {obj.label.trim()} - Weight (%)</label><input type="number" id={`weight-${obj.value}`} value={details.weight} onChange={(e) => handleObjectiveDetailChange(obj.value, 'weight', e.target.value)} placeholder="e.g., 20" required/></div></div>)}
-                    {obj.value === 'development_plan' && (<div className="field-item"><label htmlFor={`weight-${obj.value}`} className="required">{prefix} {obj.label.trim()} - Weight (%)</label><input type="number" id={`weight-${obj.value}`} value={details.weight} onChange={(e) => handleObjectiveDetailChange(obj.value, 'weight', e.target.value)} placeholder="e.g., 10" required/></div>)}
-                    {isStandardFilterObjective && (
-                      <div className="inline-fields-container">
-                        <div className="field-item">
-                          <label className="required">{prefix} {obj.label.trim()} - Filters</label>
-                          <Dropdown label="Filter" options={getFilterOptionsForObjective(obj)} selected={details.filter} onSelectedChange={(option) => handleObjectiveDetailChange(obj.value, 'filter', option)} />
-                        </div>
-                        <div className="field-item">
-                          <label htmlFor={`weight-${obj.value}`} className="required">{prefix} {obj.label.trim()} - Weight (%)</label>
-                          <input type="number" id={`weight-${obj.value}`} value={details.weight} onChange={(e) => handleObjectiveDetailChange(obj.value, 'weight', e.target.value)} placeholder="e.g., 20" required/>
+                    return (
+                      <div key={obj.value} className="objective-row">
+                        <div className="objective-name"><span className="prefix">{prefix}</span>{obj.label.trim()}</div>
+                        <div className="objective-input-group">
+                          {isStandardFilterObjective && (<div className="objective-input"><Dropdown label="Filter" options={getFilterOptionsForObjective(obj)} selected={details.filter} onSelectedChange={(option) => handleObjectiveDetailChange(obj.value, 'filter', option)} /></div>)}
+                          {obj.category === 'Individual' && (<div className="objective-input"><AutoGrowTextarea value={details.objectiveText} onChange={(e) => handleObjectiveDetailChange(obj.value, 'objectiveText', e.target.value)} placeholder="Define the specific goal" required /></div>)}
+                          {obj.value === 'development_plan' && ( <div className="objective-input" /> )}
+                          <div className="objective-input">
+                            <div className="input-with-unit">
+                              <input type="number" value={details.weight} onChange={(e) => handleObjectiveDetailChange(obj.value, 'weight', e.target.value)} placeholder="Weight" required/>
+                              <span className="input-unit">%</span>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    )}
-                  </div>
-                );
-              })}
-              
-              {/* --- SUBMIT SECTION --- */}
-              <div className="submit-container">
-                {/* UPDATED: The old divider and border-top on this container are replaced by the <hr> above */}
-                <p className="submit-description">A copy of your responses will be automatically sent to you and your manager when you submit.</p>
-                <div className="submit-feedback-container">
-                  <button type="submit" className="submit-btn" disabled={submissionStatus === 'submitting'}>
-                    {submissionStatus === 'submitting' ? 'Submitting...' : 'Submit'}
-                  </button>
-                  {submissionStatus === 'success' && <div className="success-checkmark"></div>}
+                    );
+                  })}
                 </div>
-                {hasObjectives && totalWeight !== 100 && ( <p className="weight-helper-text">Total weight must be 100% to submit. Current: {totalWeight}%</p> )}
+              </>
+            )}
+            
+            <div className="submit-container">
+              <p className="submit-description">A copy of your responses will be automatically sent to you and your manager when you submit.</p>
+              <div className="submit-feedback-container">
+                <button type="submit" className="submit-btn" disabled={submissionStatus === 'submitting'}>
+                  {submissionStatus === 'submitting' ? 'Submitting...' : 'Submit'}
+                </button>
+                {submissionStatus === 'success' && <div className="success-checkmark"></div>}
               </div>
-            </form>
-          </main>
-        </div>
-        {hasObjectives && ( <div className="summary-wrapper"> <SummaryBox selectedObjectives={formData.objective.filter(obj => !obj.isHeader)} objectiveDetails={formData.objectiveDetails} /> </div> )}
+              {hasObjectives && totalWeight !== 100 && ( <p className="weight-helper-text">Total weight must be 100% to submit. Current: {totalWeight}%</p> )}
+            </div>
+          </form>
+        </main>
       </div>
       {showSuccessModal && ( <div className="modal-overlay"> <div className="modal-content"> <h2>Success!</h2> <p>Your OKR objectives have been submitted successfully.</p> <button className="modal-close-btn" onClick={() => setShowSuccessModal(false)}> Close </button> </div> </div> )}
     </div>

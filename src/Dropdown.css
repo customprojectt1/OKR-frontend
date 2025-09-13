@@ -4,95 +4,98 @@
   font-size: 1rem;
 }
 
+/* UPDATED: Dropdown Header */
 .dropdown-header {
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #fff;
+  padding: 8px 12px; /* Reduced padding */
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  background-color: #f9f9f9;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  user-select: none; /* Prevents text selection on click */
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.dropdown-header:hover {
-  border-color: #999;
-}
-
-.dropdown-container:focus-within .dropdown-header {
-  border-color: #0073B1;
-  box-shadow: 0 0 0 2px rgba(0, 115, 177, 0.2);
-}
-
-.dropdown-arrow {
-  transition: transform 0.3s ease;
-}
-
-.dropdown-arrow.open {
-  transform: rotate(180deg);
-}
-
-.dropdown-list-container {
-  position: absolute;
-  width: 100%;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #fff;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  z-index: 1000; /* Ensures it appears above other elements */
-  margin-top: 4px;
-  max-height: 250px;
+  align-items: flex-start; /* Align to top to better handle overflow */
+  user-select: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+  max-height: 70px;
   overflow-y: auto;
 }
 
-.dropdown-list {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
+.dropdown-header:hover { border-color: #b0b0b0; }
+.dropdown-container:focus-within .dropdown-header {
+  border-color: #0073B1;
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(0, 115, 177, 0.15);
 }
 
-.dropdown-list-item {
-  padding: 12px;
+/* UPDATED: Control buttons on the right */
+.dropdown-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-left: 10px;
+  position: sticky; /* Makes the controls stick to the top right */
+  top: 4px;
+  right: 0;
+}
+.clear-all {
+  font-size: 1.5rem;
+  color: #888;
   cursor: pointer;
-  transition: background-color 0.2s;
+  line-height: 1;
 }
+.clear-all:hover { color: #333; }
+.dropdown-arrow { transition: transform 0.3s ease; }
+.dropdown-arrow.open { transform: rotate(180deg); }
 
-.dropdown-list-item:hover {
-  background-color: #f0f8ff; /* A light blue hover effect */
-}
-
+/* UPDATED: Tag Styles for a "Pill" look */
 .dropdown-header-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px; /* More space between tags */
+  flex-grow: 1;
 }
-
 .tag-item {
-  background-color: #e0eaf1;
-  color: #003E51;
-  padding: 4px 8px;
-  border-radius: 4px;
+  background-color: #e4e6eb; /* Lighter grey */
+  color: #050505; /* Darker text */
+  padding: 6px 10px;
+  border-radius: 15px; /* Rounded pill shape */
   display: flex;
   align-items: center;
   font-size: 0.9em;
+  font-weight: 500;
+  white-space: nowrap;
 }
-
 .tag-remove {
   margin-left: 8px;
   cursor: pointer;
   font-weight: bold;
   font-size: 1.1em;
   line-height: 1;
+  color: #65676b;
 }
+.tag-remove:hover { color: #000; }
 
-.tag-remove:hover {
-  color: #d9534f; /* A reddish color for the remove icon */
+/* ... List styles remain the same ... */
+.dropdown-list-container {
+  position: absolute;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 1000;
+  margin-top: 6px;
+  max-height: 250px;
+  overflow-y: auto;
 }
+.dropdown-list { list-style-type: none; padding: 5px 0; margin: 0; }
+.dropdown-list-item { padding: 10px 16px; cursor: pointer; transition: background-color 0.2s; font-size: 0.95rem; }
+.dropdown-list-item:hover { background-color: #f0f8ff; }
+.dropdown-list-item.is-header { font-weight: bold; color: #555; background-color: #f4f5f7; cursor: default; font-size: 0.9rem; padding: 8px 16px; }
+.dropdown-list-item.selected { background-color: #0073b1; color: white; }
 
-/* Style for highlighting selected items in the list */
-.dropdown-list-item.selected {
-  background-color: #0073b1;
-  color: white;
-}
+/* --- NEW: Custom Scrollbar for the Dropdown Header --- */
+.dropdown-header::-webkit-scrollbar { width: 8px; }
+.dropdown-header::-webkit-scrollbar-track { background: transparent; }
+.dropdown-header::-webkit-scrollbar-thumb { background: #d1d1d1; border-radius: 10px; }
+.dropdown-header::-webkit-scrollbar-thumb:hover { background: #b0b0b0; }
