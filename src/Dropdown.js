@@ -1,3 +1,4 @@
+// src/Dropdown.js
 import React, { useState, useEffect, useRef } from 'react';
 import './Dropdown.css';
 
@@ -32,10 +33,9 @@ const Dropdown = ({ label, options, selected, onSelectedChange, isMulti = false 
     }
   };
 
-  // NEW: Handler for the "Clear All" button
   const handleClearAll = (e) => {
-    e.stopPropagation(); // Prevent the dropdown from opening/closing
-    onSelectedChange([]); // Set the selection to an empty array
+    e.stopPropagation();
+    onSelectedChange([]);
   };
 
   const renderHeader = () => {
@@ -76,7 +76,14 @@ const Dropdown = ({ label, options, selected, onSelectedChange, isMulti = false 
             {options.map((option) => {
               const isSelected = isMulti ? selected.some(item => item.value === option.value) : selected?.value === option.value;
               return (
-                <li key={option.value} className={`dropdown-list-item ${isSelected ? 'selected' : ''} ${option.isHeader ? 'is-header' : ''}`} onClick={() => !option.isHeader && handleOptionClick(option)}>
+                // --- THIS IS THE ONLY CHANGE ---
+                // We have removed the conditional `!option.isHeader` check.
+                // Now, every item, including headers, is clickable.
+                <li
+                  key={option.value}
+                  className={`dropdown-list-item ${isSelected ? 'selected' : ''} ${option.isHeader ? 'is-header' : ''}`}
+                  onClick={() => handleOptionClick(option)}
+                >
                   {option.label}
                 </li>
               );

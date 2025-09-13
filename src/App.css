@@ -46,7 +46,10 @@
 .input-with-unit { position: relative; }
 .input-unit { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: #888; pointer-events: none; font-weight: 500; }
 .input-with-unit input[type="number"] { padding-right: 40px; }
-.input-with-unit input[type="number"] { -moz-appearance: textfield; }
+.input-with-unit input[type="number"] {
+  -moz-appearance: textfield; /* For Firefox */
+  appearance: textfield; /* Standard property for modern browsers */
+}
 .input-with-unit input[type="number"]::-webkit-inner-spin-button,
 .input-with-unit input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 
