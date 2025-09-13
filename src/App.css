@@ -42,18 +42,32 @@
 .objective-input { flex: 1; }
 .objective-input input, .objective-input .dropdown-container .dropdown-header { padding: 10px 14px; font-size: 0.95rem; }
 
-/* --- NEW: Styles for the Weight Input with a Percent Sign --- */
-.input-with-unit { position: relative; }
-.input-unit { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: #888; pointer-events: none; font-weight: 500; }
-.input-with-unit input[type="number"] { padding-right: 40px; }
+/* --- UPDATED: Styles for the External Percent Sign --- */
+.input-with-unit {
+  display: flex; /* Use flexbox for alignment */
+  align-items: center;
+  gap: 8px; /* Space between the input and the '%' sign */
+}
+.input-with-unit input {
+  flex-grow: 1; /* Let the input box take up all available space */
+  /* Remove the right padding that was for the internal sign */
+  padding-right: 16px; 
+}
+.input-unit {
+  color: #888;
+  font-weight: 500;
+  font-size: 1rem;
+}
+/* This part is no longer needed with the external unit, but is kept for browser compatibility */
 .input-with-unit input[type="number"] {
   -moz-appearance: textfield; /* For Firefox */
   appearance: textfield; /* Standard property for modern browsers */
 }
 .input-with-unit input[type="number"]::-webkit-inner-spin-button,
 .input-with-unit input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+/* --- END UPDATED Styles --- */
 
-/* --- NEW: Styles for Goal Tracker below Objective Box --- */
+/* --- Goal Tracker Styles --- */
 .summary-goal-tracker { text-align: center; margin-top: 15px; font-size: 0.95em; font-weight: 500; transition: all 0.3s ease; }
 .summary-goal-tracker p { margin: 0; padding: 10px; border-radius: 6px; }
 .goal-pending { color: #005a8c; background-color: #e9f5ff; border: 1px solid #b3d9f7; }

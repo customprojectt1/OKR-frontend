@@ -59,7 +59,7 @@ function App() {
   const [submissionStatus, setSubmissionStatus] = useState('idle');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  // All handlers and helpers remain the same
+  // ... (All handlers and helpers are the same)
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -76,6 +76,18 @@ function App() {
   };
   const handleObjectiveDetailChange = (objectiveValue, fieldName, value) => {
     setFormData(prev => ({ ...prev, objectiveDetails: { ...prev.objectiveDetails, [objectiveValue]: { ...prev.objectiveDetails[objectiveValue], [fieldName]: value } } }));
+  };
+  const handleWeightChange = (objectiveValue, value) => {
+    if (value === '') {
+      handleObjectiveDetailChange(objectiveValue, 'weight', '');
+      return;
+    }
+    const isOnlyDigits = /^\d+$/.test(value);
+    if (!isOnlyDigits) { return; }
+    const numValue = parseInt(value, 10);
+    if (numValue >= 1 && numValue <= 100) {
+      handleObjectiveDetailChange(objectiveValue, 'weight', String(numValue));
+    }
   };
   const getPrefix = (objective) => {
     const categoryMap = { 'Brand': 'B', 'Demand': 'D', 'Digital': 'DM', 'Comms': 'C', 'Ops': 'O', 'People': 'P', 'Individual': '' };
@@ -96,7 +108,7 @@ function App() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // Validation is the same
+    // Your validation is the same
     const missingFields = [];
     if (!formData.yourName.trim()) missingFields.push("Your Name");
     if (!formData.yourEmail.trim()) missingFields.push("Your Email Address");
@@ -144,14 +156,14 @@ function App() {
   };
 
   const hasObjectives = formData.objective.length > 0;
-
   const sortedObjectivesForForm = [...formData.objective].sort((a, b) => {
     const indexA = objectiveSortOrder.indexOf(a.value);
     const indexB = objectiveSortOrder.indexOf(b.value);
     return indexA - indexB;
   });
-
   const percentageLeft = Math.round(100 - totalWeight);
+  // NEW: Calculate the amount to decrease by
+  const amountToDecrease = Math.round(totalWeight - 100);
 
   return (
     <div>
@@ -164,25 +176,27 @@ function App() {
             <div className="form-group"><label htmlFor="yourEmail" className="required">Your Email Address</label><div className="input-with-icon"><svg className="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg><input type="email" id="yourEmail" name="yourEmail" value={formData.yourEmail} onChange={handleInputChange} required/></div></div>
             <div className="form-group"><label htmlFor="managerEmail" className="required">Manager's Email Address</label><input type="email" id="managerEmail" name="managerEmail" value={formData.managerEmail} onChange={handleInputChange} required/></div>
             <div className="form-group"><label className="required">MLT Lead</label><Dropdown label="MLT Lead" options={mltLeadOptions} selected={formData.mltLead} onSelectedChange={(option) => handleDropdownChange('mltLead', option)} /></div>
-            <div className="form-group"><label className="required">Objective</label><p className="field-description">Select all of the objectives that apply to your OKRs. Details will display below for you to choose the weight and granularity.</p><Dropdown label="Objective" options={objectiveOptions} selected={formData.objective} onSelectedChange={handleObjectiveChange} isMulti /></div>
-            
-            {hasObjectives && (
-              <>
-                {/* --- THIS IS THE NEW LOCATION FOR THE GOAL TRACKER --- */}
+            <div className="form-group">
+              <label className="required">Objective</label>
+              <p className="field-description">Select all of the objectives that apply to your OKRs. Details will display below for you to choose the weight and granularity.</p>
+              <Dropdown label="Objective" options={objectiveOptions} selected={formData.objective} onSelectedChange={handleObjectiveChange} isMulti />
+              {hasObjectives && (
                 <div className="summary-goal-tracker">
                   {totalWeight > 0 && totalWeight < 100 && (<p className="goal-pending">You have <strong>{percentageLeft}%</strong> left to reach 100%.</p>)}
                   {totalWeight === 100 && (<p className="goal-reached">🎉 Goal Reached! Total weight is 100%.</p>)}
                   {totalWeight > 100 && (<p className="weight-warning">Total weight cannot exceed 100%.</p>)}
                 </div>
-                
+              )}
+            </div>
+            
+            {hasObjectives && (
+              <>
                 <hr className="form-divider" />
-                
                 <div className="objective-rows-container">
                   {sortedObjectivesForForm.filter(obj => !obj.isHeader).map(obj => {
                     const prefix = getPrefix(obj);
                     const details = formData.objectiveDetails[obj.value] || {};
                     const isStandardFilterObjective = obj.category !== 'Individual' && obj.value !== 'development_plan';
-
                     return (
                       <div key={obj.value} className="objective-row">
                         <div className="objective-name"><span className="prefix">{prefix}</span>{obj.label.trim()}</div>
@@ -192,7 +206,7 @@ function App() {
                           {obj.value === 'development_plan' && ( <div className="objective-input" /> )}
                           <div className="objective-input">
                             <div className="input-with-unit">
-                              <input type="number" value={details.weight} onChange={(e) => handleObjectiveDetailChange(obj.value, 'weight', e.target.value)} placeholder="Weight" required/>
+                              <input type="number" value={details.weight} onChange={(e) => handleWeightChange(obj.value, e.target.value)} placeholder="Weight" required min="1" max="100"/>
                               <span className="input-unit">%</span>
                             </div>
                           </div>
@@ -212,7 +226,16 @@ function App() {
                 </button>
                 {submissionStatus === 'success' && <div className="success-checkmark"></div>}
               </div>
-              {hasObjectives && totalWeight !== 100 && ( <p className="weight-helper-text">Total weight must be 100% to submit. Current: {totalWeight}%</p> )}
+
+              {/* --- THIS IS THE UPDATED LOGIC --- */}
+              {hasObjectives && totalWeight !== 100 && ( 
+                <p className="weight-helper-text">
+                  {totalWeight < 100
+                    ? `Total weight must be 100% to submit. Current: ${totalWeight}% || Left: ${percentageLeft}%`
+                    : `Total weight exceeds 100%. Please decrease by ${amountToDecrease}%.`
+                  }
+                </p> 
+              )}
             </div>
           </form>
         </main>
